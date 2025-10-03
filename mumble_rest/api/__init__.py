@@ -169,11 +169,11 @@ def delete_user_id(
 
     # Return 404 if not found
     if server is None:
-        return 404, "Server Not Found"
+        return 404, {"error": "Server Not Found"}
 
     user = get_registered_user(server, user_id)
     if not user:
-        return 404, "User Not Found"
+        return 404, {"error": "User Not Found"}
 
     unregister_user(server, user_id)
 
@@ -199,11 +199,11 @@ def delete_users_kick(request, server_id: int, user_name: str = "", reason: str 
 
     # Return 404 if not found
     if server is None:
-        return 404, "Server Not Found"
+        return 404, {"error": "Server Not Found"}
 
     user = get_active_username(server, user_name)
     if not user:
-        return 404, "User Not Found"
+        return 404, {"error": "User Not Found"}
 
     server.kickUser(user.get("session"), reason)
 
