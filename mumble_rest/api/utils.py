@@ -61,20 +61,35 @@ def get_all_users_count(meta):
         user_count += (s.isRunning() and len(s.getUsers())) or 0
     return user_count
 
+
+def get_active_username(server, user_name: str):
+    """
+    Gets the entire list of users online count by iterating through servers.
+    """
+    users = obj_to_dict(server.getUsers())
+    for u in users.values():
+        if user_name == u.get("name"):
+            return u
+    return False
+
+
 def get_registered_user(server, uid):
     try:
         return server.getRegistration(uid)
     except MumbleServer.InvalidUserException:
         return False
 
+
 def get_registered_users(server, search_str):
     return server.getRegisteredUsers(search_str)
+
 
 def get_registered_user_ids(server):
     try:
         return [id for id, _ in server.getRegisteredUsers("").items()]
     except:
-        return []    
+        return []
+
 
 def get_registered_user_id(server, user_name: str):
     users = get_registered_users(server, user_name)
@@ -82,6 +97,7 @@ def get_registered_user_id(server, user_name: str):
         if u.lower() == user_name.lower():
             return id
     return False
+
 
 def register_user(server, user_name: str):
     new_user = {
@@ -92,17 +108,20 @@ def register_user(server, user_name: str):
     uid = server.registerUser(new_user)
     return uid
 
+
 def update_user_pass(server, user_name: str, password: str):
     uid = get_registered_user_id(server, user_name)
-    user_pass ={
+    user_pass = {
         MumbleServer.UserInfo.UserPassword: password,
         MumbleServer.UserInfo.UserHash: None,
         MumbleServer.UserInfo.UserComment: f"last updated {timezone.now()}"
     }
     server.updateRegistration(uid, user_pass)
 
+
 def unregister_user(server, user_id: int):
     server.unregisterUser(user_id)
+
 
 def check_user_pass(server, user_name: str, password: str):
     test = server.verifyPassword(user_name, password)
@@ -112,17 +131,20 @@ def check_user_pass(server, user_name: str, password: str):
     }
     return results.get(test, "Success")
 
+
 def str_to_groups(groups_str):
     return groups_str.split(",")
 
+
 def update_user_groups(server, user_name: str, password: str):
     uid = get_registered_user_id(server, user_name)
-    user_pass ={
+    user_pass = {
         MumbleServer.UserInfo.UserPassword: password,
         MumbleServer.UserInfo.UserHash: None,
         MumbleServer.UserInfo.UserComment: f"last updated {timezone.now()}"
     }
     server.updateRegistration(uid, password)
+
 
 def get_channel_acls(server, chid: int):
     acls = []
@@ -132,10 +154,12 @@ def get_channel_acls(server, chid: int):
 
     return acls, groups, inherit
 
+
 @dataclass
 class ACLGroup:
     name: str
     users: list[int]
+
 
 def set_group_add(groups, group_name, add_ids):
     for group in groups:
@@ -144,10 +168,12 @@ def set_group_add(groups, group_name, add_ids):
             return True
     return False
 
+
 def filter_uids(server_uids, users):
     return [u for u in users if u in server_uids]
 
-def set_channel_acls(server, chid: int, newGroup: list[ACLGroup]=[]):
+
+def set_channel_acls(server, chid: int, newGroup: list[ACLGroup] = []):
     acls = []
     groups = []
     inherit = False
@@ -166,7 +192,8 @@ def set_channel_acls(server, chid: int, newGroup: list[ACLGroup]=[]):
             groups.append(_g)
         elif g.name in names:
             set_group_add(groups, g.name, uids)
-    server.setACL(chid, acls, groups, inherit )
+    server.setACL(chid, acls, groups, inherit)
     return acls, groups, inherit
 
-STD_RESPONSES={200: dict, 401: str, 402: str, 403: str, 404: str }
+
+STD_RESPONSES = {200: dict, 401: str, 402: str, 403: str, 404: str}

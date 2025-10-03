@@ -5,13 +5,15 @@ from ..mumble_ice import Meta
 from ninja.security import django_auth
 from ninja import Form, NinjaAPI
 from .servers import ServerEndpoints
-from .users import UserEndpoints
+from .users import UserEndpoints, get_registered_user
 from .acls import ACLEndpoints
-from .utils import ACLGroup, check_user_pass, get_channel_acls, get_registered_user_id, register_user, set_channel_acls, update_user_pass
-from ninja.security import APIKeyQuery
+from .active import ActiveEndpoints
+from .utils import ACLGroup, check_user_pass, get_active_username, get_channel_acls, get_registered_user_id, register_user, set_channel_acls, unregister_user, update_user_pass
+from ninja.security import APIKeyHeader
 from mumble_rest.models import APIKey
 
-class check_api_key(APIKeyQuery):
+
+class api_key(APIKeyHeader):
     def authenticate(self, request: HttpRequest, key: Optional[str]) -> Optional[Any]:
         test = False
         for t in APIKey.objects.all():
@@ -25,7 +27,7 @@ class check_api_key(APIKeyQuery):
 api = NinjaAPI(
     title="Mumble Rest",
     auth=[
-        check_api_key()
+        api_key()
     ]
 )
 
@@ -147,7 +149,72 @@ def get_auth_update_groups(
     }
 
 
+@api.delete(
+    "auth/users/delete",
+    response={
+        200: dict,
+        404: dict,
+    },
+    tags=["Auth"]
+)
+def delete_user_id(
+    request,
+    server_id: int,
+    user_id: int,
+):
+    """
+        Delete user from server
+    """
+    server = Meta.meta.getServer(server_id)
+
+    # Return 404 if not found
+    if server is None:
+        return 404, "Server Not Found"
+
+    user = get_registered_user(server, user_id)
+    if not user:
+        return 404, "User Not Found"
+
+    unregister_user(server, user_id)
+
+    return 200, {
+        "user_id": user_id,
+        "kicked": 'Success'
+    }
+
+
+@api.delete(
+    "auth/users/kick",
+    response={
+        200: dict,
+        404: dict,
+    },
+    tags=["Active"]
+)
+def delete_users_kick(request, server_id: int, user_name: str = "", reason: str = "Auth Revoked"):
+    """
+        Kick user on server
+    """
+    server = Meta.meta.getServer(server_id)
+
+    # Return 404 if not found
+    if server is None:
+        return 404, "Server Not Found"
+
+    user = get_active_username(server, user_name)
+    if not user:
+        return 404, "User Not Found"
+
+    server.kickUser(user.get("session"), reason)
+
+    return 200, {
+        "user_id": user.get("userid"),
+        "kicked": 'Success'
+    }
+
+
 if settings.DEBUG and False:
     ServerEndpoints(api)
     UserEndpoints(api)
     ACLEndpoints(api)
+    ActiveEndpoints(api)

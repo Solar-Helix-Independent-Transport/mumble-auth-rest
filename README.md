@@ -4,7 +4,7 @@
 
 Mumble-Auth-REST is a RESTful web application wrapper over the Murmur SLICE API to auth users form Alliance Auth.
 
-this project is heavily based on [Murmur-Rest](https://github.com/alfg/murmur-rest)
+This project is heavily based on [Murmur-Rest](https://github.com/alfg/murmur-rest)
 
 ## Setup
 1. clone repo

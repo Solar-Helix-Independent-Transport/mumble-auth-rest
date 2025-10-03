@@ -5,7 +5,7 @@ from ..mumble_ice import Meta, MumbleServer
 from .utils import STD_RESPONSES, check_user_pass, get_channel_acls, get_registered_user_id, get_registered_users, get_server_conf, get_server_port, obj_to_dict, register_user, unregister_user, update_user_pass
 from django.utils import timezone
 
-class UserEndpoints():
+class ActiveEndpoints():
     def __init__(self, api):
 
         @api.get(
