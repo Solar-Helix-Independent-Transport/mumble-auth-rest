@@ -2,7 +2,6 @@ from typing import Any, Optional
 from django.http import HttpRequest
 from django.conf import settings
 from ..mumble_ice import Meta
-from ninja.security import django_auth
 from ninja import Form, NinjaAPI
 from .servers import ServerEndpoints
 from .users import UserEndpoints, get_registered_user
@@ -28,7 +27,8 @@ api = NinjaAPI(
     title="Mumble Rest",
     auth=[
         api_key()
-    ]
+    ],
+    openapi_url=settings.DEBUG and "/openapi.json" or ""
 )
 
 
