@@ -34,7 +34,7 @@ class ClientSecretField(models.CharField):
             
             hashed_secret = make_password(secret)
             test = check_password(secret, hashed_secret)
-            print(test)
+            # print(test)
             setattr(model_instance, self.attname, hashed_secret)
             return hashed_secret
         return super().pre_save(model_instance, add)

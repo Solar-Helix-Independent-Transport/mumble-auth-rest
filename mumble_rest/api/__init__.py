@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Optional
 from django.http import HttpRequest
 from django.conf import settings
@@ -11,6 +12,7 @@ from .utils import ACLGroup, check_user_pass, get_active_username, get_channel_a
 from ninja.security import APIKeyHeader
 from mumble_rest.models import APIKey
 
+logger = logging.getLogger(__name__)
 
 class api_key(APIKeyHeader):
     def authenticate(self, request: HttpRequest, key: Optional[str]) -> Optional[Any]:
@@ -18,6 +20,7 @@ class api_key(APIKeyHeader):
         for t in APIKey.objects.all():
             _t = t.test(key)
             if _t:
+                logger.info(f"{request} - {t.name} - success")
                 test = True
                 break
         return test
