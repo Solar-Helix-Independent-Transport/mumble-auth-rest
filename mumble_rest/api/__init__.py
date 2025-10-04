@@ -11,6 +11,7 @@ from .active import ActiveEndpoints
 from .utils import ACLGroup, check_user_pass, get_active_username, get_channel_acls, get_registered_user_id, register_user, set_channel_acls, unregister_user, update_user_pass
 from ninja.security import APIKeyHeader
 from mumble_rest.models import APIKey
+from django.contrib.admin.views.decorators import staff_member_required
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,8 @@ api = NinjaAPI(
     auth=[
         api_key()
     ],
-    openapi_url=settings.DEBUG and "/openapi.json" or ""
+    docs_decorator=staff_member_required
+    # openapi_url=settings.DEBUG and "/openapi.json" or ""
 )
 
 
