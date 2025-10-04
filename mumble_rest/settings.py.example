@@ -8,8 +8,14 @@ SECRET_KEY = ""
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# add your URL if thats your jam
-ALLOWED_HOSTS = ["localhost",]
+# URLS
+BASE_URL = ""
+
+ALLOWED_HOSTS = [""]
+CSRF_TRUSTED_ORIGINS = [
+    ""
+],
+CSRF_TRUSTED_ORIGINS = [""]
 
 # Ice connectivity
 ICE_HOST_HOST = os.environ.get('MURMUR_ICE_HOST', 'localhost')

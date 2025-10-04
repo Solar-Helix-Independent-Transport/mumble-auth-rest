@@ -7,7 +7,7 @@ from django.views.decorators.cache import cache_page
 from .mumble_ice import Meta
 from .api.utils import get_server_conf, get_server_port
 
-@cache_page(30)
+# @cache_page(30)
 def index(request):
     server = None
     servers = []
