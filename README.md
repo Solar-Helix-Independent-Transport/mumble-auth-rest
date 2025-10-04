@@ -12,9 +12,9 @@ This project is heavily based on [Murmur-Rest](https://github.com/alfg/murmur-re
 1. install deps `pip install -r requirements.txt`
 1. rename `mumble-rest/settings.py.example` to `mumble-rest/settings.py`
 1. update `mumble-rest/settings.py` to your liking
-  - ice access key
-  - urls and allowed hosts
-  - etc... 
+   - ice access key
+   - urls and allowed hosts
+   - etc... 
 1. create database `python manage.py migrate`
 1. create su `python manage.py createsuperuser`
 1. run server `python manage.py runserver localhost:8008`
@@ -61,6 +61,7 @@ You do not need to expose this API publically if you don't want to you can simpl
 
 ### Resources
 - [Mumble SLICE API](https://www.mumble.info/documentation/slice/1.3.0/html/_sindex.html)
+- [Mumbleverse](https://github.com/Solar-Helix-Independent-Transport/allianceauth-mumble-multiverse)
 
 ### License
 
