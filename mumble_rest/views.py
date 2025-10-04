@@ -1,13 +1,13 @@
 from datetime import timedelta
 from django.shortcuts import render
 from django.conf import settings
-# from django.contrib.auth.decorators import login_required, permission_required
+
 from django.views.decorators.cache import cache_page
 
 from .mumble_ice import Meta
 from .api.utils import get_server_conf, get_server_port
 
-# @cache_page(30)
+@cache_page(30)
 def index(request):
     server = None
     servers = []
