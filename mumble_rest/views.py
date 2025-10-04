@@ -1,6 +1,7 @@
 from datetime import timedelta
 from django.shortcuts import render
 from django.conf import settings
+from django.core.cache import cache
 
 from django.views.decorators.cache import cache_page
 
@@ -9,9 +10,17 @@ from .api.utils import get_server_conf, get_server_port
 
 # @cache_page(30)
 def index(request):
-    server = None
-    servers = []
-    if request.user.is_authenticated:
+    _context = {
+        "debug": settings.DEBUG,
+        "server": {
+                "up": "Not OK",
+                "version": None,
+            },
+        "servers": []
+    }
+    cached_context = cache.get("index-cache", None)
+    if not cached_context:
+        servers = []
         try:
             for s in Meta.meta.getAllServers():
                 port = get_server_port(Meta.meta, s)
@@ -31,20 +40,20 @@ def index(request):
                 })
         except:
             pass
+        _context['servers'] = servers
+        try:
+            s = Meta.meta.getVersion()
+            ut = Meta.meta.getUptime()
+            _context['server'] = {
+                "up": ut,
+                "version": s[3],
+            }
+        except Exception as e: 
+            pass
+    else:
+        _context = cached_context
     try:
-        s = Meta.meta.getVersion()
-        ut = Meta.meta.getUptime()
-        server = {
-            "up": ut,
-            "version": s[3],
-        }
-    except Exception as e: 
+        cache.set("index-cache", _context, 30)
+    except Exception as e:
         pass
-    context = {
-        "host": "mumble.sh1t.space",
-        "debug": settings.DEBUG,
-        "server": server,
-        "servers": servers
-    }
-
-    return render(request, 'mumble_rest/index.html', context=context)
+    return render(request, 'mumble_rest/index.html', context=_context)

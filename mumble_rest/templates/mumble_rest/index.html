@@ -144,7 +144,7 @@
         <div>
           <h3 class="float-md-start mb-0">Mumble Auth</h3>
           <nav class="nav nav-masthead justify-content-center float-md-end">
-            {% if debug or user.is_superuser %}
+            {% if user.is_authenticated %}
                 <a
                 class="nav-link fw-bold py-1 px-0 active"
                 aria-current="page"
@@ -152,20 +152,17 @@
                 >Server</a
                 >
                 <a class="nav-link fw-bold py-1 px-0" href="/api/docs">API</a>
+                <a class="nav-link fw-bold py-1 px-0" href="/admin">Admin</a>
             {% endif %}
           </nav>
         </div>
       </header>
       <main class="px-3">
-        <!-- <h1>Mumble Server Status</h1> -->
         {% if server %}
             <div class="card text-bg-success mb-3" >
                 <div class="card-body">
                     <h5 class="card-title">Server OK</h5>
                     <p class="card-text">Version: {{ server.version }}</p>
-                    <!-- <a href="mumble://{{host}}" class="btn btn-lg btn-light fw-bold border-white bg-white">
-                        Click to connect
-                    </a> -->
                 </div>
             </div>
         {% else %}
@@ -173,29 +170,27 @@
                 <div class="card-body">
                     <h5 class="card-title">Server Unresponsive</h5>
                     <p class="card-text">Contact an Admin</p>
-                    <!-- <p class="card-text">Version: {{ server.version }}</p> -->
-                    <!-- <a href="mumble://{{host}}" class="btn btn-lg btn-light fw-bold border-white bg-white">
-                        Click to connect
-                    </a> -->
                 </div>
             </div>
         {% endif %}
-        {% if servers %}
-            {% for s in servers %}
-              <div class="card  mb-3" >
-                  <div class="card-body">
-                      <h5 class="card-title">Server {{s.id}}</h5>
-                      <hr/>
-                      <p class="card-text">Port: {{ s.port }}</p>
-                      <p class="card-text">Uptime: {{ s.uptime }}</p>
-                      <p class="card-text">Users: {{ s.users }}</p>
-                      <p class="card-text">Max Users: {{ s.maxusers }}</p>
-                      <!-- <a href="mumble://{{host}}" class="btn btn-lg btn-light fw-bold border-white bg-white">
-                          Click to connect
-                      </a> -->
-                  </div>
-              </div>
-              {% endfor %}
+        {% if user.is_authenticated %}
+          {% if servers %}
+              {% for s in servers %}
+                <div class="card  mb-3" >
+                    <div class="card-body">
+                        <h5 class="card-title">Server {{s.id}}</h5>
+                        <hr/>
+                        <p class="card-text">Port: {{ s.port }}</p>
+                        <p class="card-text">Uptime: {{ s.uptime }}</p>
+                        <p class="card-text">Users: {{ s.users }}</p>
+                        <p class="card-text">Max Users: {{ s.maxusers }}</p>
+                        <!-- <a href="mumble://{{host}}" class="btn btn-lg btn-light fw-bold border-white bg-white">
+                            Click to connect
+                        </a> -->
+                    </div>
+                </div>
+                {% endfor %}
+          {% endif %}
         {% endif %}
 
       </main>
