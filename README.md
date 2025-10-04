@@ -8,11 +8,18 @@ This project is heavily based on [Murmur-Rest](https://github.com/alfg/murmur-re
 
 ## Setup
 1. clone repo
-1. rename `settings.py.example` to `settings.py`
-1. update `settings.py` to your liking
-1. fire up the server
+1. create and enter a venv `python3 -m venv .venv` `source .venv/bin/activate`
+1. install deps `pip install -r requirements.txt`
+1. rename `mumble-rest/settings.py.example` to `mumble-rest/settings.py`
+1. update `mumble-rest/settings.py` to your liking
+  - ice access key
+  - urls and allowed hosts
+  - etc... 
+1. create database `python manage.py migrate`
+1. create su `python manage.py createsuperuser`
+1. run server `python manage.py runserver localhost:8008`
 
-###  Deployment for Production
+##  Deployment for Production
 
 Following the same steps for Deployment for Development, just use a Python WSGI application server
 such as [Gunicorn](http://gunicorn.org/) instead of the built-in Flask server. The provided `wsgi.py`
@@ -21,13 +28,35 @@ file is provided for this.
 For example, if using Gunicorn and virtualenv:
 
 ```
-/path/to/mumble-rest/env/bin/gunicorn -b 127.0.0.1:8080 wsgi:app
+/path/to/mumble-rest/env/bin/gunicorn -b 127.0.0.1:8008 wsgi:app
 ```
 
-### TODO
+### Cloudflaird and nginx statics
+```conf
+server { # Listen for incoming HTTP requests on port 80.
+    listen 8000;
+    server_name localhost; # local host only.
 
-- API Documentation
-- Error Handling
+    location /static { # Static files need to be here make sure perms are good.
+        alias /var/www/mumblerest/static; 
+        autoindex off;
+    }
+
+    location / { # else goto the gunicorn instance.
+        proxy_pass http://localhost:8008; # Forward requests to your backend server.
+        proxy_set_header Host $host; # Pass the original Host header.
+        proxy_set_header X-Real-IP $remote_addr; # Pass the client's real IP address.
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; # Pass a list of IP addresses the request has traversed.
+        proxy_set_header X-Forwarded-Proto $scheme; # Pass the original protocol (HTTP or HTTPS).
+    }
+}
+```
+
+### SSH Tunnels vs Public API
+You do not need to expose this API publically if you don't want to you can simple run an ssh tunnel between the 2 servers and hit it that way.
+
+## TODO
+- Better Error Handling
 - Tests
 
 ### Resources
