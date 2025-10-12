@@ -1,3 +1,4 @@
+from datetime import timedelta
 import logging
 from typing import Any, Optional
 from django.http import HttpRequest
@@ -48,6 +49,23 @@ def get_status(request):
         s = Meta.meta.getVersion()
         ut = Meta.meta.getUptime()
         return 200, {'status': 'OK', "version": s, "uptime": ut}
+    except:
+        return 503, {'status': 'NOTOK'}
+
+
+@api.get(
+    "/user_count",
+    tags=["Status"])
+def get_user_count(
+    request,
+    server_id: int = 0
+):
+    """
+        Mumble Users
+    """
+    try:
+        server = Meta.meta.getServer(server_id)
+        return 200, (len(server.getUsers())) or 0
     except:
         return 503, {'status': 'NOTOK'}
 
