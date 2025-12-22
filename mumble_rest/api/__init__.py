@@ -238,7 +238,7 @@ def delete_users_kick(request, server_id: int, user_name: str = "", reason: str 
 @api.get(
     "/servers/{server_id}/user_list",
     response={
-        200: dict,
+        200: list[dict],
         404: dict,
     },
     tags=["Server"]
