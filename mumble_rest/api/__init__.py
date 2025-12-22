@@ -9,7 +9,7 @@ from .servers import ServerEndpoints
 from .users import UserEndpoints, get_registered_user
 from .acls import ACLEndpoints
 from .active import ActiveEndpoints
-from .utils import ACLGroup, check_user_pass, get_active_username, get_channel_acls, get_registered_user_id, register_user, set_channel_acls, unregister_user, update_user_pass
+from .utils import ACLGroup, check_user_pass, get_active_username, get_channel_acls, get_registered_user_id, obj_to_dict, register_user, set_channel_acls, unregister_user, update_user_pass
 from ninja.security import APIKeyHeader
 from mumble_rest.models import APIKey
 from django.contrib.admin.views.decorators import staff_member_required
@@ -235,6 +235,31 @@ def delete_users_kick(request, server_id: int, user_name: str = "", reason: str 
         "kicked": 'Success'
     }
 
+@api.get(
+    "/servers/{server_id}/user_list",
+    response={
+        200: dict,
+        404: dict,
+    },
+    tags=["Server"]
+)
+def get_server_server_id(request, server_id: int,):
+    """
+    Lists servers registered users
+    """
+
+    server = Meta.meta.getServer(server_id)
+
+    # Return 404 if not found
+    if server is None:
+        return 404, {"error": "Server Not Found"}
+
+    out = []
+    users = server.getRegisteredUsers('') if server.isRunning() else []
+    for u in users:
+        _u = obj_to_dict(server.getRegistration(u))
+        out.append(_u)
+    return out
 
 if settings.DEBUG and False:
     ServerEndpoints(api)
