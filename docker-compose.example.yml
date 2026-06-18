@@ -19,7 +19,7 @@
 services:
 
   mumble:
-    image: mumblevoip/mumble-server:1.4
+    image: mumblevoip/mumble-server:v1.5.901
     restart: always
     env_file: .env-mumble
     ports:
