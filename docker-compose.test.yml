@@ -1,0 +1,23 @@
+services:
+
+  mumble:
+    image: mumblevoip/mumble-server:1.4
+    environment:
+      - MUMBLE_SUPERUSER_PASSWORD=ci-test-pass
+      - MUMBLE_CONFIG_serverpassword=
+      - MUMBLE_CONFIG_ice=tcp -h 0.0.0.0 -p 6502
+      - MUMBLE_CONFIG_icesecretread=ci-ice-secret
+      - MUMBLE_CONFIG_icesecretwrite=ci-ice-secret
+
+  mumble_rest:
+    build: .
+    environment:
+      - SECRET_KEY=ci-django-secret-key-not-for-production
+      - MURMUR_ICE_HOST=mumble
+      - MURMUR_ICE_PORT=6502
+      - ICE_SECRET=ci-ice-secret
+      - ALLOWED_HOSTS=localhost,mumble_rest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mumble
