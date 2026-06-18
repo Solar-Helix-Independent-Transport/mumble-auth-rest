@@ -14,11 +14,29 @@ jobs:
       - name: Build and start services
         run: docker compose -f docker-compose.test.yml up -d --build
 
+      - name: Wait for mumble_rest to be running
+        run: |
+          echo "Waiting for mumble_rest..."
+          for i in $(seq 1 30); do
+            STATUS=$(docker inspect --format '{{.State.Status}}' \
+              "$(docker compose -f docker-compose.test.yml ps -q mumble_rest)" 2>/dev/null || echo "unknown")
+            echo "  attempt $i: $STATUS"
+            if [ "$STATUS" = "running" ]; then
+              echo "Container is up"
+              break
+            fi
+            if [ "$STATUS" = "exited" ] || [ "$STATUS" = "dead" ]; then
+              echo "Container exited unexpectedly — logs:"
+              docker compose -f docker-compose.test.yml logs
+              exit 1
+            fi
+            [ "$i" = "30" ] && { echo "Timed out"; docker compose -f docker-compose.test.yml logs; exit 1; }
+            sleep 3
+          done
+
       - name: Create API key
         id: apikey
         run: |
-          # Give mumble a moment to initialise Ice before mumble_rest connects
-          sleep 10
           API_KEY=$(docker compose -f docker-compose.test.yml exec -T mumble_rest \
             python manage.py shell -c \
             "from mumble_rest.models import APIKey, generate_token; k=generate_token(); APIKey.objects.create(name='ci', token=k); print(k, end='')")
