@@ -43,6 +43,7 @@ api = NinjaAPI(
 
 @api.get(
     "/health-check",
+    response={200: dict, 503: dict},
     tags=["Status"])
 def get_status(request):
     """
@@ -58,6 +59,7 @@ def get_status(request):
 
 @api.get(
     "/user_count",
+    response={200: dict, 503: dict},
     tags=["Status"])
 def get_user_count(
     request,
