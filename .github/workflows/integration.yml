@@ -14,23 +14,25 @@ jobs:
       - name: Build and start services
         run: docker compose -f docker-compose.test.yml up -d --build
 
-      - name: Wait for mumble_rest to be running
+      - name: Wait for mumble_rest to be ready
         run: |
-          echo "Waiting for mumble_rest..."
-          for i in $(seq 1 30); do
+          echo "Waiting for gunicorn to start (port 8000)..."
+          for i in $(seq 1 60); do
             STATUS=$(docker inspect --format '{{.State.Status}}' \
               "$(docker compose -f docker-compose.test.yml ps -q mumble_rest)" 2>/dev/null || echo "unknown")
-            echo "  attempt $i: $STATUS"
-            if [ "$STATUS" = "running" ]; then
-              echo "Container is up"
-              break
-            fi
             if [ "$STATUS" = "exited" ] || [ "$STATUS" = "dead" ]; then
               echo "Container exited unexpectedly — logs:"
               docker compose -f docker-compose.test.yml logs
               exit 1
             fi
-            [ "$i" = "30" ] && { echo "Timed out"; docker compose -f docker-compose.test.yml logs; exit 1; }
+            # Any HTTP response (even 401) means gunicorn is up and migrations are done
+            HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/health-check || echo "000")
+            echo "  attempt $i: container=$STATUS http=$HTTP"
+            if [ "$HTTP" != "000" ]; then
+              echo "Ready"
+              break
+            fi
+            [ "$i" = "60" ] && { echo "Timed out"; docker compose -f docker-compose.test.yml logs; exit 1; }
             sleep 3
           done
 
