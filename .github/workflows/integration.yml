@@ -39,8 +39,7 @@ jobs:
       - name: Create API key and run tests
         run: |
           API_KEY=$(docker compose -f docker-compose.test.yml exec -T mumble_rest \
-            python manage.py shell -c \
-            "from mumble_rest.models import APIKey, generate_token; k=generate_token(); APIKey.objects.create(name='ci', token=k); print(k, end='')" \
+            python tests/create_api_key.py \
             | tr -d '\r\n')
           echo "::add-mask::$API_KEY"
           bash tests/integration.sh "$API_KEY"
