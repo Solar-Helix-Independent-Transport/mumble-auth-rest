@@ -4,7 +4,7 @@ from django.conf import settings
 import Ice
 
 # Load up Murmur slice file into Ice
-Ice.loadSlice('', ['-I' + Ice.getSliceDir(), os.path.join(settings.MUMBLE_ROOT, settings.SLICE_FILE)])
+Ice.loadSlice(f"-I{Ice.getSliceDir()} {os.path.join(settings.MUMBLE_ROOT, settings.SLICE_FILE)}")
 import MumbleServer
 
 class MumbleMeta():
