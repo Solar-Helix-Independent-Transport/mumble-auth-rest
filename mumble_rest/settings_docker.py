@@ -5,7 +5,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "https://localhost"] + [o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 
 ICE_HOST_HOST = os.environ.get("MURMUR_ICE_HOST", "mumble")
 ICE_HOST_PORT = os.environ.get("MURMUR_ICE_PORT", "6502")
