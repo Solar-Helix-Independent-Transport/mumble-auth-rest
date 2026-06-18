@@ -1,0 +1,68 @@
+# Example: add these two services and the env vars to your
+# allianceauth docker-compose.yml to deploy mumble + mumble-rest.
+#
+# Also required in your AllianceAuth setup:
+#   conf/requirements.txt  →  add:  allianceauth-mumble-multiverse
+#   conf/local.py          →  add to INSTALLED_APPS:  'mumbleverse',
+#
+# After starting, create an API key in Django admin:
+#   http://<host>/admin  →  Mumble Rest → API Keys → Add
+#   Copy the key before saving — it is hashed on save.
+#
+# Then register your server in the AllianceAuth admin:
+#   Admin → Mumbleverse servers → Add
+#     mumble_url:  mumble.your-domain.com:64738   (public, for clients)
+#     api_url:     http://mumble_rest:8000         (internal docker URL)
+#     api_key:     <key copied above>
+#     virtual server id: 1
+
+services:
+
+  mumble:
+    image: mumblevoip/mumble-server:1.4
+    restart: always
+    env_file: .env-mumble
+    ports:
+      - "64738:64738"
+      - "64738:64738/udp"
+    volumes:
+      - mumble-data:/data
+    environment:
+      - MUMBLE_SUPERUSER_PASSWORD=${MUMBLE_SUPERUSER_PASSWORD}
+      - MUMBLE_CONFIG_serverpassword=${MUMBLE_SERVER_PASSWORD:-}
+      - MUMBLE_CONFIG_ice=tcp -h 0.0.0.0 -p 6502
+      - MUMBLE_CONFIG_icesecretread=${MUMBLE_ICE_SECRET}
+      - MUMBLE_CONFIG_icesecretwrite=${MUMBLE_ICE_SECRET}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10Mb"
+        max-file: "5"
+
+  mumble_rest:
+    image: ghcr.io/pvyparts/mumble-auth-rest:main
+    restart: always
+    env_file: .env-mumble
+    expose:
+      - 8000
+    volumes:
+      - mumble-rest-data:/data
+    environment:
+      - SECRET_KEY=${MUMBLE_REST_SECRET_KEY}
+      - MURMUR_ICE_HOST=mumble
+      - MURMUR_ICE_PORT=6502
+      - ICE_SECRET=${MUMBLE_ICE_SECRET}
+      - ALLOWED_HOSTS=mumble_rest,localhost
+    depends_on:
+      - mumble
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10Mb"
+        max-file: "5"
+
+volumes:
+  mumble-data:
+  mumble-rest-data:
+
+# Copy .env-mumble.example to .env-mumble and fill in the values.
