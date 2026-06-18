@@ -36,18 +36,14 @@ jobs:
             sleep 3
           done
 
-      - name: Create API key
-        id: apikey
+      - name: Create API key and run tests
         run: |
           API_KEY=$(docker compose -f docker-compose.test.yml exec -T mumble_rest \
             python manage.py shell -c \
             "from mumble_rest.models import APIKey, generate_token; k=generate_token(); APIKey.objects.create(name='ci', token=k); print(k, end='')" \
             | tr -d '\r\n')
           echo "::add-mask::$API_KEY"
-          echo "key=$API_KEY" >> "$GITHUB_OUTPUT"
-
-      - name: Run integration tests
-        run: bash tests/integration.sh "${{ steps.apikey.outputs.key }}"
+          bash tests/integration.sh "$API_KEY"
 
       - name: Dump logs on failure
         if: failure()
