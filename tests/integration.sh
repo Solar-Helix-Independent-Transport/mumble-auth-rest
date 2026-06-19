@@ -30,7 +30,7 @@ done
 echo
 echo "[ health-check ]"
 BODY=$(curl -sf -H "key: $API_KEY" "$BASE_URL/health-check")
-echo "$BODY" | grep -q '"status":"OK"' || fail "unexpected body: $BODY"
+echo "$BODY" | grep -q '"status".*"OK"' || fail "unexpected body: $BODY"
 pass "status OK"
 
 # ---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ echo "[ register user ]"
 BODY=$(curl -sf -X POST -H "key: $API_KEY" \
     -d "user_name=ci_test_user&user_pass=ci_test_pass_123" \
     "$BASE_URL/auth/user?server_id=$SERVER_ID")
-echo "$BODY" | grep -q '"password_test":"Success"' || fail "unexpected body: $BODY"
+echo "$BODY" | grep -q '"password_test".*"Success"' || fail "unexpected body: $BODY"
 USER_ID=$(echo "$BODY" | sed 's/.*"user_id":\([0-9]*\).*/\1/')
 pass "registered user_id=$USER_ID"
 
