@@ -53,8 +53,8 @@ def get_status(request):
         s = Meta.meta.getVersion()
         ut = Meta.meta.getUptime()
         return 200, {'status': 'OK', "version": s, "uptime": ut}
-    except:
-        return 503, {'status': 'NOTOK'}
+    except Exception as e:
+        return 503, {'status': 'NOTOK', "error": str(e)}
 
 
 @api.get(
