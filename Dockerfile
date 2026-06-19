@@ -21,4 +21,4 @@ RUN mkdir -p /data
 ENV DJANGO_SETTINGS_MODULE=mumble_rest.settings_docker
 ENV DB_PATH=/data/db.sqlite3
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn mumble_rest.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
+CMD ["sh", "-c", "python manage.py migrate --fake-initial && gunicorn mumble_rest.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
