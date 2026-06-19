@@ -6,7 +6,7 @@ import Ice
 # Load up Murmur slice file into Ice
 import sys
 _stderr, sys.stderr = sys.stderr, open(os.devnull, 'w')
-Ice.loadSlice(['-I' + Ice.getSliceDir(), "-d", os.path.join(settings.MUMBLE_ROOT, settings.SLICE_FILE)])
+Ice.loadSlice(['-I' + Ice.getSliceDir(), os.path.join(settings.MUMBLE_ROOT, settings.SLICE_FILE)])
 sys.stderr = _stderr
 import MumbleServer
 
