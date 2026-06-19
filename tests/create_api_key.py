@@ -8,7 +8,7 @@ import django
 django.setup()
 
 from django.core.management import call_command
-call_command('migrate', verbosity=0)
+call_command('migrate', verbosity=0, fake_initial=True)
 
 from mumble_rest.models import APIKey, generate_token
 
