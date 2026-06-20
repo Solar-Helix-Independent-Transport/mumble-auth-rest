@@ -188,11 +188,14 @@ def get_auth_update_groups(
 def delete_user_id(
     request,
     server_id: int,
-    user_id: int,
+    user_id: Optional[int] = None,
 ):
     """
         Delete user from server
     """
+    if user_id is None:
+        return 404, {"error": "User ID Required"}
+
     server = Meta.meta.getServer(server_id)
 
     # Return 404 if not found

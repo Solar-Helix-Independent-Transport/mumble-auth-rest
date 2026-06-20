@@ -50,7 +50,7 @@ BODY=$(curl -sf -X POST -H "key: $API_KEY" \
     -d "user_name=ci_test_user&user_pass=ci_test_pass_123" \
     "$BASE_URL/auth/user?server_id=$SERVER_ID")
 echo "$BODY" | grep -q '"password_test".*"Success"' || fail "unexpected body: $BODY"
-USER_ID=$(echo "$BODY" | sed 's/.*"user_id":\([0-9]*\).*/\1/')
+USER_ID=$(echo "$BODY" | python3 -c "import json,sys; print(json.load(sys.stdin)['user_id'])")
 pass "registered user_id=$USER_ID"
 
 # ---------------------------------------------------------------------------
