@@ -4,8 +4,6 @@ from ..mumble_ice import MumbleServer
 
 class ChannelGroup(Schema):
     name: str
-    add: list[int] = []
-    remove: list[int] = []
     inherit: bool = True
     inheritable: bool = True
 
@@ -34,8 +32,6 @@ def export_channels(server) -> list[dict]:
         for g in groups:
             channel_groups.append({
                 "name": g.name,
-                "add": list(g.add),
-                "remove": list(g.remove),
                 "inherit": g.inherit,
                 "inheritable": g.inheritable,
             })
