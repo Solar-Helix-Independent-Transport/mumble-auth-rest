@@ -70,7 +70,7 @@ def get_user_count(
     """
     try:
         server = Meta.meta.getServer(server_id)
-        return 200, (len(server.getUsers())) or 0
+        return 200, {'user_count': len(server.getUsers())}
     except:
         return 503, {'status': 'NOTOK'}
 
